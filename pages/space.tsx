@@ -75,19 +75,6 @@ const ISSView = () => {
 const PeopleView = () => {
   const [people, setPeople] = useState<PeopleResponse>();
 
-  const sendPerson = async (person: Person) => {
-    try {
-      await axios.post(
-        "https://cff00ebb-62b0-4961-88fb-d68e1995dfd5.mock.pstmn.io",
-        {
-          data: person,
-        },
-      );
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
   useEffect(() => {
     const getPeople = async () => {
       try {
@@ -107,12 +94,37 @@ const PeopleView = () => {
       {people?.people.map((person) => {
         return (
           <li key={person.name + "/" + person.craft}>
-            <button onClick={() => sendPerson(person)}>{person.name}</button>
+            <PersonButton person={person} />
           </li>
         );
       })}
     </ul>
   );
+};
+
+const PersonButton = ({ person }: { person: Person }) => {
+  const [buttonText, setButtonText] = useState("");
+
+  const sendPerson = async (person: Person) => {
+    setButtonText(person.craft);
+    setTimeout(() => setButtonText(person.name), 3000);
+    try {
+      await axios.post(
+        "https://cff00ebb-62b0-4961-88fb-d68e1995dfd5.mock.pstmn.io",
+        {
+          data: person,
+        },
+      );
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  useEffect(() => {
+    setButtonText(person.name);
+  }, [person.name]);
+
+  return <button onClick={() => sendPerson(person)}>{buttonText}</button>;
 };
 
 export default Space;
